@@ -1,0 +1,27 @@
+---
+# This workflow will run periodically to check for new releases of prometheus
+# and create pr to update the version when available
+
+name: Update
+
+on:
+  schedule:
+    - cron: '23 7 * * *'
+  workflow_dispatch:
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check Version of Prometheus
+        run: |
+          current= $(grep -oP '(?<=version_num=").*(?=")' install_prometheus.sh)
+          latest= $(curl -s -XGET https://api.github.com/repos/prometheus/prometheus/releases/latest | jq .tag_name | grep -oP '(?<="v).*(?=")')
+          if test $current -neq $latest; then echo "NEW_VERSION=$latest" >> $GITHUB_ENV
+          sed -i '5s/.*/version_num="$latest"/' file.txt
+        working-directory: ./prometheus
+      
+      - name: Create PR
+        if: ${{ env.NEW_VERSION != '' }}
+        uses: peter-evans/create-pull-request@v3.10.1
