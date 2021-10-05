@@ -16,6 +16,7 @@ jobs:
 
       - name: Check Version of Prometheus
         run: |
+          echo "Hello World"
           set -e
           current=$(grep -oP '(?<=version_num=").*(?=")' install_prometheus.sh)
           latest=$(curl -s -XGET https://api.github.com/repos/prometheus/prometheus/releases/latest | jq .tag_name | grep -oP '(?<="v).*(?=")')
