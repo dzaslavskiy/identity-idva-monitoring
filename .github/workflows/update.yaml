@@ -18,7 +18,7 @@ jobs:
         run: |
           current=$(grep -oP '(?<=version_num=").*(?=")' install_prometheus.sh)
           latest=$(curl -s -XGET https://api.github.com/repos/prometheus/prometheus/releases/latest | jq .tag_name | grep -oP '(?<="v).*(?=")')
-          sed -i '5s/.*/version_num="$latest"/' install_prometheus.sh
+          sed -i '5s/.*/version_num="'$latest'"/' install_prometheus.sh
         working-directory: ./prometheus
       
       - name: Create PR
